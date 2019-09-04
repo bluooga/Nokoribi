@@ -36,4 +36,24 @@ public class CameraController : MonoBehaviour
 
 	}
 
+
+	public void setCursorLock(){
+		if(lockCursor){
+			lockCursor = false;
+			checkCursorState();
+		}else if (!lockCursor){
+			lockCursor = true;
+			checkCursorState();
+		}
+	}
+
+	void checkCursorState(){
+		if (lockCursor) {
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.visible = false;
+		} else if (lockCursor == false){
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
+		}
+	}
 }

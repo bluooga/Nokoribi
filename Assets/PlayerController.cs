@@ -16,13 +16,19 @@ public class PlayerController : MonoBehaviour
 
 	[SerializeField] [Range(0,1)] public float speedSmoothTime;
 	[SerializeField] public bool canJump; 
+	[SerializeField] public bool isDead;
+	[SerializeField] public bool isPaused;
 	float speedSmoothVelocity;
 	float currentSpeed;
 	float velocityY;
 
+	[SerializeField] public GameObject PauseMenu;
+	[SerializeField] public GameObject DeathMenu;
+
 	Animator animator;
 	Transform cameraT;
 	CharacterController controller;
+
 
 	void Start () {
 		animator = GetComponent<Animator> ();
@@ -46,6 +52,11 @@ public class PlayerController : MonoBehaviour
 			Jump ();
 			WallJump();
 		}
+
+		if(Input.GetButtonDown("Cancel") && isDead == false){
+			pauseGame();
+		}
+
 		// animator
 		/*/float animationSpeedPercent = ((running) ? currentSpeed / runSpeed : currentSpeed / walkSpeed * .5f);
 		animator.SetFloat ("speedPercent", animationSpeedPercent, speedSmoothTime, Time.deltaTime);
@@ -123,6 +134,25 @@ public class PlayerController : MonoBehaviour
 	}
 
 	void DeathEXE(){
-	Destroy(gameObject);	
+	Destroy(gameObject);
+	isDead = true;
+	DeathMenu.SetActive(true);
+	Time.timeScale = 0;
+	cameraT.GetComponent<CameraController>().setCursorLock();
 	}
+
+	public void pauseGame(){
+		if(isPaused == false){
+			isPaused = true;
+			PauseMenu.SetActive(true);
+			Time.timeScale = 0;
+			cameraT.GetComponent<CameraController>().setCursorLock();
+		} else if(isPaused){
+			isPaused = false;
+			PauseMenu.SetActive(false);
+			Time.timeScale = 1;
+			cameraT.GetComponent<CameraController>().setCursorLock();
+		}
+	}
+
 }
