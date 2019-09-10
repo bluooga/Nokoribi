@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] [Range(0,1)] public float airControlPercent;
 
 	[SerializeField] [Range(0,1)] public float turnSmoothTime;
+
 	float turnSmoothVelocity;
 
 	[SerializeField] [Range(0,1)] public float speedSmoothTime;
@@ -40,7 +41,7 @@ public class PlayerController : MonoBehaviour
 		// input
 		Vector2 input = new Vector2 (Input.GetAxisRaw ("Horizontal"), Input.GetAxisRaw ("Vertical"));
 		Vector2 inputDir = input.normalized;
-		bool running = Input.GetKey (KeyCode.LeftShift);
+		bool running = Input.GetButton("Fire3");
 
 		Move (inputDir, running);
 
@@ -48,7 +49,7 @@ public class PlayerController : MonoBehaviour
 			canJump = true;
 		}
 
-		if (Input.GetKeyDown (KeyCode.Space)) {
+		if (Input.GetButtonDown("Jump")) {
 			Jump ();
 			WallJump();
 		}
@@ -57,10 +58,11 @@ public class PlayerController : MonoBehaviour
 			pauseGame();
 		}
 
+
 		// animator
-		/*/float animationSpeedPercent = ((running) ? currentSpeed / runSpeed : currentSpeed / walkSpeed * .5f);
-		animator.SetFloat ("speedPercent", animationSpeedPercent, speedSmoothTime, Time.deltaTime);
-        /*/ 
+		float animationSpeedPercent = ((running) ? currentSpeed / runSpeed : currentSpeed / walkSpeed * .5f);
+		animator.SetFloat ("SpeedPercent", animationSpeedPercent, speedSmoothTime, Time.deltaTime);
+         
 	}
 
 	public void Move(Vector2 inputDir, bool running) {
@@ -113,25 +115,29 @@ public class PlayerController : MonoBehaviour
 		return smoothTime / airControlPercent;
 	}
 
-	void OnTriggerEnter(Collider other){
-        if(other.gameObject.CompareTag("Jumpable")){
-            Debug.Log("can walljump");
+	void OnControllerColliderHit(ControllerColliderHit hit){
+
+        if(hit.gameObject.CompareTag("Jumpable") && hit.normal.y < 0.1){
+            Debug.Log("can walljump on right");
 			if(canJump == false){
             canJump = true;
 			}
-        }
 
+		//Debug.Log("hit at " + hit.normal.y);
+	}
+}
+
+	void OnTriggerEnter(Collider other){
 		if(other.gameObject.CompareTag("Death")){
 			DeathEXE();
-		}
-    }
+			Debug.Log("you are dead");
+	}
+}
 
 	void OnTriggerExit(Collider other){
 		if(other.gameObject.CompareTag("Jumpable")){
-            Debug.Log("can't walljump");
-			if(canJump == true){
-            canJump = false;
-			}
+			canJump = false;
+			Debug.Log("exit jumpable area");
 		}
 	}
 
@@ -156,5 +162,4 @@ public class PlayerController : MonoBehaviour
 			cameraT.GetComponent<CameraController>().setCursorLock();
 		}
 	}
-
 }
